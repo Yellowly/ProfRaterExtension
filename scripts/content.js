@@ -1,5 +1,3 @@
-// stolen from google tutorial
-
 const article = document.querySelector("article");
 
 // `document.querySelector` may return null if the selector doesn't match anything.
@@ -20,5 +18,5 @@ if (article) {
   // Support for article docs with date
   const date = article.querySelector("time")?.parentNode;
 
-  (date ?? heading).insertAdjacentElement("afterend", badge);
+  //(date ?? heading).insertAdjacentElement("afterend", badge);
 }
