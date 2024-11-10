@@ -97,8 +97,8 @@ popupcontent.textContent="none"
 popupcontent.setAttribute("class","profpopupcontent")
 popupthingy.appendChild(popupcontent);
 
-
-function show_popup(response, iter = 10) {
+let typing = false;
+async function show_popup(response, iter = 10) {
     popupthingy.style.left = `${10}px`;
     popupthingy.style.top = `${10}px`;
     console.log(reply);
@@ -111,25 +111,38 @@ function show_popup(response, iter = 10) {
     popupnumelements.textContent = `Based on ${response.prof_num_ratings}`;
     popupheader.textContent = response.prof_name;
     popupcontent.textContent = ""; // Clear existing text before typing
-    typeText(response.summary); // Start the typing effect
+    typing = true;
+    await typeText(response.summary); // Start the typing effect
+   
+    typing = false;
+    console.log("DONE TYPING!",typing)
+
     popuplink.setAttribute("href", response.link);
     popuplink.focus();
     popupthingy.showPopover();
     popupthingy.style.display = "grid";
 }
-function typeText(text) {
+async function typeText(text) {
+    typing = true;
     let index = 0;
 
    
-    function typeCharacter() {
+    async function typeCharacter() {
+        typing = true;
         if (index < text.length) {
             popupcontent.textContent += text.charAt(index);
             index++;
-            setTimeout(typeCharacter, 20); 
+            await new Promise(resolve => setTimeout(resolve, 20));
+            await typeCharacter();
+          
+            
+        }else{
+            typing = false
         }
+        
     }
 
-    typeCharacter(); // Start typing
+    await typeCharacter(); // Start typing
 }
 
 
@@ -233,10 +246,13 @@ chrome.runtime.sendMessage({ type: "SEND_ARRAY", data: professorsList }, (respon
 
 });
 
-document.onkeydown = function(e) {
+/*document.onkeydown = function(e) {
     if(e.keyCode==39){
-        curr_displayed=Math.min(++curr_displayed,stored_responses.length-1)
-        show_popup(stored_responses[curr_displayed]);
+        console.log("right",typing)
+        if (typing == true){
+            curr_displayed=Math.min(++curr_displayed,stored_responses.length-1)
+            show_popup(stored_responses[curr_displayed]);
+        }
     }else if (e.keyCode==37){
         curr_displayed=Math.max(--curr_displayed, 0)
         show_popup(stored_responses[curr_displayed]);
@@ -252,12 +268,37 @@ document.onkeydown = function(e) {
     }else if (e.keyCode==27){
         popupthingy.style.display="none";
     }
-}
+}*/
+
+document.onkeydown = function(e) {
+    if (typing) return; 
+
+    if (e.keyCode == 39) { // Right arrow key
+        console.log("right", typing);
+        curr_displayed = Math.min(++curr_displayed, stored_responses.length - 1);
+        show_popup(stored_responses[curr_displayed]);
+    } else if (e.keyCode == 37) { // Left arrow key
+        curr_displayed = Math.max(--curr_displayed, 0);
+        show_popup(stored_responses[curr_displayed]);
+    } else if (e.key == "\\") { // Backslash key
+        show_loading_popup();
+        chrome.runtime.sendMessage({ type: "SEND_ARRAY", data: [getSelectionText()] }, (response) => {
+            console.log("Response from background:", response);
+            stored_responses = response.all_data;
+            reply = response;
+            curr_displayed = 0;
+            show_popup(stored_responses[0]);
+        });
+    } else if (e.keyCode == 27) { // Escape key
+        popupthingy.style.display = "none";
+    }
+};
 
 popupthingy.onblur = function(){
     popupthingy.hidePopover()
     popupthingy.style.display = "none";
 }
+
 
 
 
