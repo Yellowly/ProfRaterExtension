@@ -145,14 +145,14 @@ async function typeText(text) {
   await typeCharacter(); // Start typing
 }
 
-function show_loading_popup(){
+function show_loading_popup(content="Loading"){
   popupthingy.style.left=`${10}px`;
   popupthingy.style.top=`${10}px`;
 
   popupNum.textContent = ""
   popupscore.textContent = "";
   popupnumelements.textContent = "";
-  popupheader.textContent = "Loading...";
+  popupheader.textContent = content;
   popupcontent.textContent = "";
   popuplink.setAttribute("href","")
   popuplink.focus();
@@ -175,13 +175,19 @@ document.onkeydown = function(e) {
       curr_displayed=Math.max(--curr_displayed, 0)
       show_popup(stored_responses[curr_displayed], curr_displayed+1);
   }else if (e.key=="\\"){
-    show_loading_popup();
+    //show_loading_popup();
       chrome.runtime.sendMessage({ type: "SEND_ARRAY", data: [getSelectionText()] }, (response) => {
           console.log("Response from background:", response);
           stored_responses=response.all_data;
           reply = response;
-          curr_displayed=0;
-          show_popup(stored_responses[0], curr_displayed+1);
+          if(response.hasOwnProperty("message")){
+            console.log("about to alert")
+            show_loading_popup("This professor does not have a RateMyProfessor page.")
+          } else {
+            curr_displayed=0;
+            show_popup(stored_responses[0], curr_displayed+1);
+          }
+          
       });
   }else if (e.keyCode==27){
       popupthingy.style.display="none";
