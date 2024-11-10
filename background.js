@@ -230,7 +230,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {(async 
       sendResponse({all_data: responses});
     } else{
       //responses = []
-      sendResponse({message: "None of the professors for this class have a RateMyProfessor page. You're cooked!"})
+      sendResponse({message: "None of the professors for this class have a RateMyProfessor page."})
     }
 }
 })(); return true;});
