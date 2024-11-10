@@ -1,0 +1,2 @@
+This AI-powered tool simplifies course registration by scanning and summarizing professor reviews from Rate My Professors. Integrated into a Chrome extension, it activates during registration, automatically aggregating feedback on teaching styles, course difficulty, and overall student satisfaction. The AI generates concise summaries for each professor you're considering, giving you quick and reliable insights at a glance. With this tool, you can make informed decisions, build a schedule tailored to your needs, and ensure a successful, stress-free semester.
+
