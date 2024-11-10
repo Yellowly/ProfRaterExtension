@@ -1,3 +1,10 @@
+
+async function loadConfig() {
+    const response = await fetch(chrome.runtime.getURL("config.json"));
+    const config = await response.json();
+    console.log("Loaded Config:", config);
+    return config;
+}
 let toptags = []
 async function get_ratemyprof_link(prof_name){
   console.log("INSIDE GET LINK FUNCTION")
@@ -169,8 +176,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {(async 
           
           let prompt = `I need to summarize the reviews of professor ${professor}. I have scraped the following data: They have an average rating of ${rating} out of 5, based on ${numratings} ratings. ${takeAgainAndDifficulty[0]} of students would take the course again and students rated the professor's average difficulty as ${takeAgainAndDifficulty[1]} out of 5. Here are the most common attributes/tags about the professor ${toptags}. Finally, here are some written reviews that students had about the professors: ${reviews}\n\n Write a short blurb that uses all of this information to summarize the reviews and what they can expect from the class. Please do not sugarcoat your review as it will be the primary factor in students' course selection. Responses should be 3 sentences max or around 50-60 words. Note that these reviews come across classes, so your summary should focus on professor rather than features of the class (as we don't know what class the student is taking with the prof)`
           
-          const apiKey = "AIzaSyAEK-YG3823HWIMcqUBFh4ys4pnNs0SUdA";
-          const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+          //const apiKey = loadConfig().then((config) => {
+        let key = "AIzaSyAEK-YG3823HWIMcqUBFh4ys4pnNs0SUdA";
+
+   
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
           
           let response = await fetch(url, {
             method: "POST",
