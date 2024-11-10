@@ -133,14 +133,14 @@ function typeText(text) {
 }
 
 
-function show_loading_popup(){
+function show_loading_popup(content="Loading"){
     popupthingy.style.left=`${10}px`;
     popupthingy.style.top=`${10}px`;
 
     popupNum.textContent = ""
     popupscore.textContent = "";
     popupnumelements.textContent = "";
-    popupheader.textContent = "Loading...";
+    popupheader.textContent = content;
     popupcontent.textContent = "";
     popuplink.setAttribute("href","")
     popuplink.focus();
@@ -223,7 +223,7 @@ chrome.runtime.sendMessage({ type: "SEND_ARRAY", data: professorsList }, (respon
     console.log("Response from background:", response);
     if(response.hasOwnProperty("message")){
         console.log("about to alert")
-        alert(response.message)
+        show_loading_popup(response.message)
     }else{
         stored_responses=response.all_data;
         curr_displayed=0;
