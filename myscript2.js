@@ -175,7 +175,7 @@ document.onkeydown = function(e) {
       curr_displayed=Math.max(--curr_displayed, 0)
       show_popup(stored_responses[curr_displayed], curr_displayed+1);
   }else if (e.key=="\\"){
-    //show_loading_popup();
+    show_loading_popup();
       chrome.runtime.sendMessage({ type: "SEND_ARRAY", data: [getSelectionText()] }, (response) => {
           console.log("Response from background:", response);
           stored_responses=response.all_data;
