@@ -95,24 +95,54 @@ popupthingy.appendChild(popupcontent);
 
 
 let reply;
-
-function show_popup(response,iter=10){
+let typing = false;
+async function show_popup(response,iter=10){
   
   popupthingy.style.left=`${10}px`;
   popupthingy.style.top=`${10}px`;
   console.log(reply)
-  if(iter ===0){
+  /*if(iter ===0){
       iter = 1;
-  }
+  }*/
   popupNum.textContent = `Option ${iter} of ${reply.all_data.length}`
   popupscore.textContent = `${response.prof_rating}/5`;
   popupnumelements.textContent = `Based on ${response.prof_num_ratings}`;
   popupheader.textContent = response.prof_name;
   popupcontent.textContent = response.summary;
+
+  typing = true;
+  await typeText(response.summary); // Start the typing effect
+   
+  typing = false;
+  console.log("DONE TYPING!",typing)
+
   popuplink.setAttribute("href",response.link)
   popuplink.focus();
   popupthingy.showPopover();
   popupthingy.style.display = "grid";
+}
+
+async function typeText(text) {
+  typing = true;
+  let index = 0;
+
+ 
+  async function typeCharacter() {
+      typing = true;
+      if (index < text.length) {
+          popupcontent.textContent += text.charAt(index);
+          index++;
+          await new Promise(resolve => setTimeout(resolve, 20));
+          await typeCharacter();
+        
+          
+      }else{
+          typing = false
+      }
+      
+  }
+
+  await typeCharacter(); // Start typing
 }
 
 function show_loading_popup(){
@@ -140,10 +170,10 @@ let curr_displayed = 0;
 document.onkeydown = function(e) {
   if(e.keyCode==39){
       curr_displayed=Math.min(++curr_displayed,stored_responses.length-1)
-      show_popup(stored_responses[curr_displayed]);
+      show_popup(stored_responses[curr_displayed], curr_displayed+1);
   }else if (e.keyCode==37){
       curr_displayed=Math.max(--curr_displayed, 0)
-      show_popup(stored_responses[curr_displayed]);
+      show_popup(stored_responses[curr_displayed], curr_displayed+1);
   }else if (e.key=="\\"){
     show_loading_popup();
       chrome.runtime.sendMessage({ type: "SEND_ARRAY", data: [getSelectionText()] }, (response) => {
@@ -151,7 +181,7 @@ document.onkeydown = function(e) {
           stored_responses=response.all_data;
           reply = response;
           curr_displayed=0;
-          show_popup(stored_responses[0]);
+          show_popup(stored_responses[0], curr_displayed+1);
       });
   }else if (e.keyCode==27){
       popupthingy.style.display="none";
